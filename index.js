@@ -7,19 +7,24 @@ let xrLayer;
 let glCanvas;
 let glContext;
 
-// デバイスが変わった時のイベント登録(最初も呼ばれる)
-navigator.xr.addEventListener("devicechange", async () => {
-  xrDevice = await navigator.xr.requestDevice();
+document.addEventListener("DOMContentLoaded", () => {
+  // デバイスが変わった時のイベント登録(最初も呼ばれる)
+  navigator.xr.addEventListener("devicechange", async () => {
+    xrDevice = await navigator.xr.requestDevice();
+  });
+  document.getElementById("enter-ar").addEventListener("click", doImmersive);
 });
-document.getElementById("enter-ar").addEventListener("click", doImmersive);
-
 async function doImmersive() {
   // XR用に描画するためのcanvasを作る
   xrCanvas = document.createElement("canvas");
+  xrCanvas.width = 512;
+  xrCanvas.height = 512;
   // XR deviceに結び付けられるためのcontext
   xrContext = xrCanvas.getContext("xrpresent");
   // WebGLで描画するためのcanvas(これをXRデバイスに結びつける)
   glCanvas = document.createElement("canvas");
+  glCanvas.width = 512;
+  glCanvas.height = 512;
   // 通常通りwebglコンテキストを作る。preserveDrawingBufferがtrueでないとならない)
   glContext = glCanvas.getContext("webgl", { preserveDrawingBuffer: true });
   // デバイスからセッションを取得する
@@ -302,8 +307,6 @@ function onStartRequestAnumationFrame() {
           0,
           1
         ];
-        const camInvMatrix = new Array(16);
-        matinv(camInvMatrix, camMatrix);
         const resultMat = new Float32Array(16);
         matmul(resultMat, projMatrix, camMatrix);
         matmul(resultMat, resultMat, modelMatrix);
